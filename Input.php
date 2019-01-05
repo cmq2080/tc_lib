@@ -7,8 +7,8 @@ namespace tc_lib;
 
 class Input
 {
-    const ALL = 'all';
-    const ONLY_GET = 'get';
+    const ALL       = 'all';
+    const ONLY_GET  = 'get';
     const ONLY_POST = 'post';
 
     private static $instance = null;
@@ -37,7 +37,7 @@ class Input
         }
     }
 
-    private $data   = [];
+    private $data = [];
     private $errMsg = [];
 
     // name=>require|string

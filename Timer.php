@@ -8,14 +8,14 @@ namespace tc_lib;
 
 class Timer
 {
-    const LEVEL_SECOND=1;
-    const LEVEL_MILLISECOND=2;
-    const LEVEL_MICROSECOND=3;
+    const LEVEL_SECOND      = 1;
+    const LEVEL_MILLISECOND = 2;
+    const LEVEL_MICROSECOND = 3;
 
-    private $start_at =null;
-    private $end_at   =null;
+    private $start_at = null;
+    private $end_at = null;
 
-    public function __contruct()
+    public function __construct()
     {
         $this->start();
     }
@@ -26,7 +26,7 @@ class Timer
      */
     public function start()
     {
-        $this->start_at =explode(' ', microtime());
+        $this->start_at = explode(' ', microtime());
     }
 
     /**
@@ -35,7 +35,7 @@ class Timer
      */
     public function end()
     {
-        $this->end_at =explode(' ', microtime());
+        $this->end_at = explode(' ', microtime());
     }
 
     /**
@@ -48,19 +48,19 @@ class Timer
     {
         switch ($level) {
             case self::LEVEL_SECOND:
-                $y=1;
+                $y = 1;
                 break;
             case self::LEVEL_MILLISECOND:
-                $y=1000;
+                $y = 1000;
                 break;
             case self::LEVEL_MICROSECOND:
-                $y=1000000;
+                $y = 1000000;
                 break;
         }
 
-        $val0=$this->end_at[0]*$y-$this->start_at[0]*$y;
-        $val1=$this->end_at[1]*$y-$this->start_at[1]*$y;
-        return $val0+$val1;
+        $val0 = $this->end_at[0] * $y - $this->start_at[0] * $y;
+        $val1 = $this->end_at[1] * $y - $this->start_at[1] * $y;
+        return $val0 + $val1;
     }
 
     /**
@@ -70,7 +70,7 @@ class Timer
      */
     public function getStartAt()
     {
-        return $this->start_at[0].' '.$this->start_at[1];
+        return $this->start_at[0] . ' ' . $this->start_at[1];
     }
 
     /**
@@ -80,6 +80,6 @@ class Timer
      */
     public function getEndAt()
     {
-        return $this->end_at[0].' '.$this->end_at[1];
+        return $this->end_at[0] . ' ' . $this->end_at[1];
     }
 }

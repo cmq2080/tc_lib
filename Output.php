@@ -9,8 +9,7 @@ namespace tc_lib;
 
 class Output
 {
-    const ERROR_UNKNOWN=99999;
-
+    const ERROR_UNKNOWN = 99999;
 
 
     private static $instance = null;

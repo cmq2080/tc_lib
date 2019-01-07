@@ -11,7 +11,7 @@ namespace tc_lib;
 class Log
 {
     // 日志前缀（日志存放的基本目录）
-    const PREFIX = '/log/www/cj_tous_member';
+    const PREFIX = '/log';
     // 日志后缀
     const SUFFIX = '.log';
 
@@ -106,9 +106,9 @@ class Log
             $fileName = date('d') . '-' . $level . self::SUFFIX;
 
             // 构建写入字符串
-            $str = '<p>';
+            $str = '<div>';
             $str .= '[' . date('Y-m-d H:i:s') . '] | <b style="' . $this->getStyle($level) . '">' . $this->header . "</b><br>\n";
-            $str .= $content . "</p>\n";
+            $str .= $content . "</div>\n";
 
             error_log($str, 3, $this->directory . '/' . $fileName);
         } catch (\Exception $e) {
@@ -128,9 +128,12 @@ class Log
         $dir      = self::PREFIX . '/' . $dirName . '/' . date('Ym', $time);
         $fileName = date('d', $time) . '-' . $level . self::SUFFIX;
 
-        // 开始写入
+        // 开始读取
         try {
-            $str = file_get_contents($dir . '/' . $fileName);
+            $str = 'No Content';
+            if (is_file($dir . '/' . $fileName)) {
+                $str = file_get_contents($dir . '/' . $fileName);
+            }
 
             echo $str;
         } catch (\Exception $e) {

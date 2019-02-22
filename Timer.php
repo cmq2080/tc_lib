@@ -8,9 +8,9 @@ namespace tc_lib;
 
 class Timer
 {
-    const LEVEL_SECOND      = 1;
-    const LEVEL_MILLISECOND = 2;
-    const LEVEL_MICROSECOND = 3;
+    const LEVEL_SECOND      = 1;// 单位：秒
+    const LEVEL_MILLISECOND = 2;// 单位：毫秒
+    const LEVEL_MICROSECOND = 3;// 单位：微秒
 
     private $start_at = null;
     private $end_at = null;

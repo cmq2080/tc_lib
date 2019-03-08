@@ -72,29 +72,18 @@ class Log
         return $this;
     }
 
-    public function debug($content)// blue
+    /**
+     * 功能：__call函数反射
+     * Created By mq at 15:00 2019-03-08
+     * @param $name
+     * @param $arguments
+     */
+    public function __call($name, $arguments)
     {
-        $this->write($content, self::DEBUG);
-    }
-
-    public function info($content)// green
-    {
-        $this->write($content, self::INFO);
-    }
-
-    public function notice($content)// purple
-    {
-        $this->write($content, self::NOTICE);
-    }
-
-    public function warning($content)// orange
-    {
-        $this->write($content, self::WARNING);
-    }
-
-    public function error($content)// red
-    {
-        $this->write($content, self::ERROR);
+        if (in_array($name, [self::DEBUG, self::INFO, self::NOTICE, self::WARNING, self::ERROR])) {
+            $content = $arguments[0];
+            $this->write($content, $name);
+        }
     }
 
     /**

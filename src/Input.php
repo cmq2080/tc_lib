@@ -4,7 +4,6 @@ namespace tc_lib;
  * 描述：
  * Created at 2018/12/8 15:43 by 陈庙琴
  */
-
 class Input
 {
     const ALL       = 'all';
@@ -34,6 +33,8 @@ class Input
             case self::ONLY_POST:
                 $this->data = $_POST;
                 break;
+            default:
+                $this->data = $_REQUEST;
         }
     }
 

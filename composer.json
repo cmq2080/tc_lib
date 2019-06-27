@@ -1,0 +1,24 @@
+{
+    "name": "cmq2080/tc_lib",
+    "description": "Temple Chan的类库",
+    "type": "library",
+    "require": {
+        "php": ">=5.5"
+    },
+    "require-dev": {
+        "php": ">=5.5"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "cmq2080",
+            "email": "1421224516@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "tc_lib\\": "src/"
+        }
+    }
+}

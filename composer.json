@@ -3,16 +3,16 @@
     "description": "Temple Chan的类库",
     "type": "library",
     "require": {
-        "php": ">=5.5"
+        "php": ">=5.4"
     },
     "require-dev": {
-        "php": ">=5.5"
+        "php": ">=5.4"
     },
     "license": "MIT",
     "authors": [
         {
-            "name": "cmq2080",
-            "email": "1421224516@qq.com"
+            "name": "Temple Chan",
+            "email": "cmq2080@gmail.com"
         }
     ],
     "minimum-stability": "dev",

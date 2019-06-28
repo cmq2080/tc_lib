@@ -11,14 +11,15 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "cmq2080",
-            "email": "1421224516@qq.com"
+            "name": "Temple Chan",
+            "email": "cmq2080@gmail.com"
         }
     ],
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "tc_lib\\": "src/"
-        }
+        },
+        "files": ["bootstrap.php"]
     }
 }

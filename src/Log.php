@@ -11,7 +11,7 @@ namespace tc_lib;
 class Log
 {
     // 默认日志前缀（日志存放的基本目录）
-    const PREFIX = '/var/log';
+    const PREFIX = '/var/log/tc_log';
     // 默认日志后缀
     const SUFFIX = '.log';
 

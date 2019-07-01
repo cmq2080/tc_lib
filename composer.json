@@ -1,12 +1,12 @@
 {
     "name": "cmq2080/tc_lib",
-    "description": "Temple Chan的类库",
+    "description": "Temple Chan的PHP类库",
     "type": "library",
     "require": {
-        "php": ">=5.4"
+        "php": ">=5.4.0"
     },
     "require-dev": {
-        "php": ">=5.4"
+        "php": ">=5.4.0"
     },
     "license": "MIT",
     "authors": [

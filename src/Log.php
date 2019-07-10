@@ -181,7 +181,7 @@ class Log
     {
         // 异常类自动转换文本
         if ($content instanceof \Exception) {
-            $content = date('Y-m-d H:i:s') . ' - line ' . $content->getLine() . ' in ' . $content->getFile() . ':<span style="color:red;">' . $content->getMessage() . "</span><br>\n" . $content->getTraceAsString();
+            $content = date('Y-m-d H:i:s') . ' - line ' . $content->getLine() . ' in ' . $content->getFile() . ':<span style="' . $this->getStyle(self::LEVEL_ERROR) . '">' . $content->getMessage() . "</span><br>\n" . $content->getTraceAsString();
         }
 
         if (is_string($content) === false) {
@@ -205,7 +205,7 @@ class Log
                 $str .= $rawStr . "<br>\n";
                 break;
             case self::MODE_HTML:
-                $str .= '<div>';
+                $str .= '<div id="' . time() . '">';
                 $str .= '[' . date('Y-m-d H:i:s') . '] | ' . $ip . ' | <b style="' . $this->getStyle($level) . '">' . $this->header . "</b><br>\n";
                 $str .= $rawStr . "</div>\n";
                 break;

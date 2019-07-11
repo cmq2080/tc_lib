@@ -201,7 +201,7 @@ class Log
         $str = '';
         switch ($this->mode) {
             case self::MODE_TEXT:
-                $str .= '[' . date('Y-m-d H:i:s') . '] | ' . $ip . ' | ' . $this->header . "<br>\n";
+                $str .= '[' . date('Y-m-d H:i:s') . '] | ' . $ip . ' | ' . $this->header . "\r\n";
                 $str .= $rawStr . "<br>\n";
                 break;
             case self::MODE_HTML:

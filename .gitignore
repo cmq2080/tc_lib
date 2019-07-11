@@ -1,5 +1,5 @@
 # 开发环境
 .idea
+.vscode
 
 # 其他
-/vendor/

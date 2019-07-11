@@ -66,6 +66,8 @@ class Timer
             case self::LEVEL_MICROSECOND:
                 $unit = self::UNIT_MICROSECOND;
                 break;
+            default:
+                throw new \Exception('未知的时间等级');
         }
         return ($val0 + $val1) . $unit;
     }

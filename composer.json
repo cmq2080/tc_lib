@@ -3,10 +3,12 @@
     "description": "Temple Chan的PHP类库",
     "type": "library",
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.6.0",
+        "ext-json": "*"
     },
     "require-dev": {
-        "php": ">=5.4.0"
+        "php": ">=5.6.0",
+        "ext-json": "*"
     },
     "license": "MIT",
     "authors": [

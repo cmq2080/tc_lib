@@ -6,9 +6,9 @@ namespace tc_lib;
  */
 class Input
 {
-    const ALL       = 'all';
-    const ONLY_GET  = 'get';
-    const ONLY_POST = 'post';
+    const ALL       = 'REQUEST';
+    const ONLY_GET  = 'GET';
+    const ONLY_POST = 'POST';
 
     private static $instance = null;
 
@@ -23,19 +23,7 @@ class Input
 
     private function __construct($mode)
     {
-        switch ($mode) {
-            case self::ALL:
-                $this->data = $_REQUEST;
-                break;
-            case self::ONLY_GET:
-                $this->data = $_GET;
-                break;
-            case self::ONLY_POST:
-                $this->data = $_POST;
-                break;
-            default:
-                $this->data = $_REQUEST;
-        }
+        $this->data = ${'_' . $mode};
     }
 
     private $data = [];

@@ -10,28 +10,30 @@ namespace tc_lib;
 
 class Log
 {
-    // 默认日志前缀（日志存放的基本目录）
-    const PREFIX = '/var/log/tc_log';
-    // 默认日志后缀
-    const SUFFIX = '.log';
-
     // 日志前缀（日志存放的基本目录）
-    public static $prefix = '';
+    public static $prefix = __DIR__ . '/../../../../runtime/tc_log';
     // 日志后缀
-    public static $suffix = '';
+    public static $suffix = '.log';
 
     // 日志级别，由轻微到严重分别是debug（调试）、info（信息）、notice（留意）、warning（警告）、error（错误）
-    const DEBUG   = 'debug';
-    const INFO    = 'info';
-    const NOTICE  = 'notice';
-    const WARNING = 'warning';
-    const ERROR   = 'error';
+    const LEVEL_DEBUG   = 'debug';
+    const LEVEL_INFO    = 'info';
+    const LEVEL_NOTICE  = 'notice';
+    const LEVEL_WARNING = 'warning';
+    const LEVEL_ERROR   = 'error';
+
+    // 日志模式，分别是text、html、markdown
+    const MODE_TEXT     = 0;
+    const MODE_HTML     = 1;
+    const MODE_MARKDOWN = 2;
 
     private static $instance = null;
     // 总目录
     private $directory = null;
     // 头信息（标题）
     private $header = null;
+    // 日志模式
+    private $mode = 0;
 
     /**
      * 功能：实例化函数
@@ -44,28 +46,45 @@ class Log
     public static function dir($dirName, $prefix = '', $suffix = '')
     {
         if (self::$instance === null) {
-            self::$instance = new self($prefix, $suffix);
+            self::$instance = new self();
         }
 
         self::$instance->setDir($dirName);
+
+        // 设置自定义的前、后缀
+        if ($prefix) {
+            self::$prefix = $prefix;
+        }
+        if ($suffix) {
+            self::$suffix = $suffix;
+        }
+
         // 清空头信息
         self::$instance->header = null;
+
         return self::$instance;
     }
 
-    private function __construct($prefix, $suffix)
+    private function __construct()
     {
-        // 优先选择传入的前、后缀
-        self::$prefix = $prefix ? $prefix : self::PREFIX;
-        self::$suffix = $suffix ? $suffix : self::SUFFIX;
     }
 
-    // 设置总目录
+    /**
+     * 功能：设置总目录
+     * Created By mq at 11:03 2019-07-10
+     * @param $dirName
+     */
     private function setDir($dirName)
     {
         $this->directory = self::$prefix . '/' . $dirName . '/' . date('Ym');
     }
 
+    /**
+     * 功能：设置标题头
+     * Created By mq at 11:03 2019-07-10
+     * @param $header
+     * @return $this
+     */
     public function header($header)
     {
         $this->header = $this->toString($header);
@@ -73,15 +92,29 @@ class Log
     }
 
     /**
+     * 功能：
+     * Created By mq at 11:11 2019-07-10
+     * @param $name
+     * @param $args
+     */
+    public function mode($mode)
+    {
+        if (in_array($mode, [self::MODE_TEXT, self::MODE_HTML, self::MODE_MARKDOWN])) {
+            $this->mode = $mode;
+        }
+        return $this;
+    }
+
+    /**
      * 功能：__call函数反射
      * Created By mq at 15:00 2019-03-08
      * @param $name
-     * @param $arguments
+     * @param $args
      */
-    public function __call($name, $arguments)
+    public function __call($name, $args)
     {
-        if (in_array($name, [self::DEBUG, self::INFO, self::NOTICE, self::WARNING, self::ERROR])) {
-            $content = $arguments[0];
+        if (in_array($name, [self::LEVEL_DEBUG, self::LEVEL_INFO, self::LEVEL_NOTICE, self::LEVEL_WARNING, self::LEVEL_ERROR])) {
+            $content = $args[0];
             $this->write($content, $name);
         }
     }
@@ -92,9 +125,9 @@ class Log
      * @param $content
      * @param $level
      */
-    public function write($content, $level)
+    private function write($content, $level)
     {
-        if (in_array($level, [self::DEBUG, self::INFO, self::NOTICE, self::WARNING, self::ERROR]) === false) {
+        if (in_array($level, [self::LEVEL_DEBUG, self::LEVEL_INFO, self::LEVEL_NOTICE, self::LEVEL_WARNING, self::LEVEL_ERROR]) === false) {
             die('级别错误');
         }
         if ($this->header === null) {
@@ -104,22 +137,17 @@ class Log
         $content = $this->toString($content);
 
         // 开始写入
-        try {
-            if (is_dir($this->directory) === false) {
-                mkdir($this->directory, 0755, true);
-            }
-
-            $fileName = date('d') . '-' . $level . self::$suffix;
-
-            // 构建写入字符串
-            $str = '<div>';
-            $str .= '[' . date('Y-m-d H:i:s') . '] | ' . $ip . ' | <b style="' . $this->getStyle($level) . '">' . $this->header . "</b><br>\n";
-            $str .= $content . "</div>\n";
-
-            error_log($str, 3, $this->directory . '/' . $fileName);
-        } catch (\Exception $e) {
-            die($e->getMessage());
+        if (is_dir($this->directory) === false) {
+            mkdir($this->directory, 0755, true);
         }
+
+        // 寻找写入文件
+        $fileName = date('d') . '-' . $level . self::$suffix;
+
+        // 构建写入字符串
+        $str = $this->mkContent($content, $level, $ip);
+
+        error_log($str, 3, $this->directory . '/' . $fileName);
     }
 
     /**
@@ -135,16 +163,12 @@ class Log
         $fileName = date('d', $time) . '-' . $level . self::$suffix;
 
         // 开始读取
-        try {
-            $str = 'No Content';
-            if (is_file($dir . '/' . $fileName)) {
-                $str = file_get_contents($dir . '/' . $fileName);
-            }
-
-            echo $str;
-        } catch (\Exception $e) {
-            die($e->getMessage());
+        $str = 'No Content';
+        if (is_file($dir . '/' . $fileName)) {
+            $str = file_get_contents($dir . '/' . $fileName);
         }
+
+        echo $str;
     }
 
     /**
@@ -157,7 +181,7 @@ class Log
     {
         // 异常类自动转换文本
         if ($content instanceof \Exception) {
-            $content = date('Y-m-d H:i:s') . ' - line ' . $content->getLine() . ' in ' . $content->getFile() . ':<span style="color:red;">' . $content->getMessage() . "</span><br>\n" . $content->getTraceAsString();
+            $content = date('Y-m-d H:i:s') . ' - line ' . $content->getLine() . ' in ' . $content->getFile() . ':<span style="' . $this->getStyle(self::LEVEL_ERROR) . '">' . $content->getMessage() . "</span><br>\n" . $content->getTraceAsString();
         }
 
         if (is_string($content) === false) {
@@ -165,6 +189,35 @@ class Log
         }
 
         return $content;
+    }
+
+    /**
+     * 功能：构建写入字符串
+     * Created By mq at 11:15 2019-07-10
+     * @param $string
+     */
+    private function mkContent($rawStr, $level, $ip)
+    {
+        $str = '';
+        switch ($this->mode) {
+            case self::MODE_TEXT:
+                $str .= '[' . date('Y-m-d H:i:s') . '] | ' . $ip . ' | ' . $this->header . "\r\n";
+                $str .= $rawStr . "<br>\n";
+                break;
+            case self::MODE_HTML:
+                $str .= '<div id="' . time() . '">';
+                $str .= '[' . date('Y-m-d H:i:s') . '] | ' . $ip . ' | <b style="' . $this->getStyle($level) . '">' . $this->header . "</b><br>\n";
+                $str .= $rawStr . "</div>\n";
+                break;
+            case self::MODE_MARKDOWN:
+                $str .= '[' . date('Y-m-d H:i:s') . '] | ' . $ip . ' | <b style="' . $this->getStyle($level) . '">' . $this->header . "</b><br>\n";
+                $str .= $rawStr . "\n" . '***' . "\n";
+                break;
+            default:
+                throw new \Exception('未知的写入模式');
+        }
+
+        return $str;
     }
 
     /**
@@ -177,19 +230,19 @@ class Log
     {
         $style = null;
         switch ($level) {
-            case self::DEBUG:
+            case self::LEVEL_DEBUG:
                 $style = 'color:blue';
                 break;
-            case self::INFO:
+            case self::LEVEL_INFO:
                 $style = 'color:green';
                 break;
-            case self::NOTICE:
+            case self::LEVEL_NOTICE:
                 $style = 'color:purple';
                 break;
-            case self::WARNING:
+            case self::LEVEL_WARNING:
                 $style = 'color:orange';
                 break;
-            case self::ERROR:
+            case self::LEVEL_ERROR:
                 $style = 'color:red';
                 break;
         }

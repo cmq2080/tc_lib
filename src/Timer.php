@@ -8,9 +8,13 @@ namespace tc_lib;
 
 class Timer
 {
-    const LEVEL_SECOND      = 1;// 单位：秒
-    const LEVEL_MILLISECOND = 2;// 单位：毫秒
-    const LEVEL_MICROSECOND = 3;// 单位：微秒
+    const LEVEL_SECOND      = 1;       // 单位：秒
+    const LEVEL_MILLISECOND = 1000;    // 单位：毫秒
+    const LEVEL_MICROSECOND = 1000000; // 单位：微秒
+
+    const UNIT_SECOND      = 's';
+    const UNIT_MILLISECOND = 'ms';
+    const UNIT_MICROSECOND = 'μs';
 
     private $start_at = null;
     private $end_at = null;
@@ -44,23 +48,28 @@ class Timer
      * @param int $level
      * @return float|int
      */
-    public function count($level = self::LEVEL_SECOND)
+    public function count($level = self::LEVEL_SECOND, $withUnit = false)
     {
-        switch ($level) {
-            case self::LEVEL_SECOND:
-                $y = 1;
-                break;
-            case self::LEVEL_MILLISECOND:
-                $y = 1000;
-                break;
-            case self::LEVEL_MICROSECOND:
-                $y = 1000000;
-                break;
+        $val0 = $this->end_at[0] * $level - $this->start_at[0] * $level;// 毫秒部分计算
+        $val1 = ($this->end_at[1] - $this->start_at[1]) * $level;// 秒部分计算
+        if ($withUnit === false) {
+            return $val0 + $val1;
         }
 
-        $val0 = $this->end_at[0] * $y - $this->start_at[0] * $y;
-        $val1 = $this->end_at[1] * $y - $this->start_at[1] * $y;
-        return $val0 + $val1;
+        switch ($level) {
+            case self::LEVEL_SECOND:
+                $unit = self::UNIT_SECOND;
+                break;
+            case self::LEVEL_MILLISECOND:
+                $unit = self::UNIT_MILLISECOND;
+                break;
+            case self::LEVEL_MICROSECOND:
+                $unit = self::UNIT_MICROSECOND;
+                break;
+            default:
+                throw new \Exception('未知的时间等级');
+        }
+        return ($val0 + $val1) . $unit;
     }
 
     /**

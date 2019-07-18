@@ -79,7 +79,7 @@ class Timer
      */
     public function getStartAt()
     {
-        return $this->start_at[0] . ' ' . $this->start_at[1];
+        return $this->start_at[1] . ltrim($this->start_at[0], '0');
     }
 
     /**
@@ -89,6 +89,6 @@ class Timer
      */
     public function getEndAt()
     {
-        return $this->end_at[0] . ' ' . $this->end_at[1];
+        return $this->end_at[1] . ltrim($this->end_at[0], '0');
     }
 }

@@ -9,10 +9,6 @@ namespace tc_lib;
 
 class Output
 {
-    // 错误状态码，可自定义
-    const ERROR_UNKNOWN = 99999;
-
-
     private static $instance = null;
 
     /**
@@ -25,6 +21,7 @@ class Output
         if (self::$instance === null) {
             self::$instance = new self();
         }
+
         // 清空数据部
         self::$instance->data = [];
 

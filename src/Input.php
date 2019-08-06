@@ -58,10 +58,9 @@ class Input
 
     /**
      * 功能：获取验证后的输入
-     * name=>require|string
-     * Created By mq at 11:42 2019-08-05
+     * Created By mq at 15:17 2019-08-06
      * @param array $ruleGroups
-     * @return array
+     * @return array|null
      */
     public function getInput($ruleGroups = [])
     {
@@ -69,20 +68,21 @@ class Input
             $rules = explode('|', $ruleGroup);
             foreach ($rules as $rule) {
                 $result = $this->checkRule($rule, $key);
-                if ($result === null) {
+                if ($result === false) {
                     break;
                 }
             }
         }
-        if (!empty($this->errMsg)) {// 有错误信息，表示肯定有验证不通过的地方
-            throw new \Exception(implode(';', $this->errMsg));
+        // 验证失败，返回null
+        if ($this->hasErr() === true) {
+            return null;
         }
 
         return $this->data;
     }
 
     /**
-     * 功能：校验输入规则
+     * 功能：验证输入规则
      * Created By mq at 11:42 2019-08-05
      * @param $rawRule
      * @param $key
@@ -136,5 +136,25 @@ class Input
         }
 
         return true;
+    }
+
+    /**
+     * 功能：判断输入验证是否成功
+     * Created By mq at 14:49 2019-08-06
+     * @return bool
+     */
+    public function hasErr()
+    {
+        return empty($this->errMsg) === false;
+    }
+
+    /**
+     * 功能：返回验证错误信息
+     * Created By mq at 14:49 2019-08-06
+     * @return array
+     */
+    public function errMsg()
+    {
+        return $this->errMsg;
     }
 }

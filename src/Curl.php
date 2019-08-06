@@ -12,7 +12,7 @@ namespace tc_lib;
 class Curl
 {
     // 默认的User-Agent
-    const USER_AGENT = 'tc_log-Curl/2.x';
+    const USER_AGENT = 'tc_lib-Curl/2.x';
 
     const METHOD_GET    = 'GET';
     const METHOD_POST   = 'POST';
@@ -29,12 +29,15 @@ class Curl
             self::$instance = new self();
         }
 
+        // 初始化header及body信息
+        self::$instance->header = ['User-Agent:' . self::USER_AGENT];
+        self::$instance->body   = [];
+
         return self::$instance;
     }
 
     private function __construct()
     {
-        $this->header[] = 'User-Agent:' . self::USER_AGENT;
     }
 
     /**
@@ -46,18 +49,18 @@ class Curl
      * @return bool|string
      * @throws \Exception
      */
-    private function exec($url, $method, $data = [])
+    private function exec($url, $method)
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HEADER, 0);// 头部不输出
 
         if ($method === self::METHOD_GET) {// GET方式提交，拼接URL字符串
-            $url .= '?' . http_build_query($data);
+            $url .= '?' . http_build_query($this->body);
             curl_setopt($ch, CURLOPT_URL, $url);
         } else {
             $this->header[] = 'X-HTTP-Method-Override:' . $method;
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);// 设置提交的数据
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->body);// 设置提交的数据
         }
 
         // 装配header
@@ -100,9 +103,10 @@ class Curl
 
     /**
      * 功能：__call函数反射
-     * Created By mq at 10:43 2019-07-26
+     * Created By mq at 15:06 2019-08-06
      * @param $name
      * @param $arguments
+     * @return bool|string
      * @throws \Exception
      */
     public function __call($name, $arguments)
@@ -115,7 +119,7 @@ class Curl
             foreach ($data as $key => $value) {// 填充请求数据
                 $this->body[$key] = $value;
             }
-            $this->exec($url, $method, $data);
+            return $this->exec($url, $method);
         }
     }
 }

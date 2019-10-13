@@ -14,6 +14,8 @@ class Log
     public static $prefix = __DIR__ . '/../../../../runtime/tc_log';
     // 日志后缀
     public static $suffix = '.log';
+    // 配置
+    public static $config = [];
 
     // 日志级别，由轻微到严重分别是debug（调试）、info（信息）、notice（留意）、warning（警告）、error（错误）
     const LEVEL_DEBUG   = 'debug';
@@ -23,17 +25,17 @@ class Log
     const LEVEL_ERROR   = 'error';
 
     // 日志模式，分别是text、html、markdown
-    const MODE_TEXT     = 0;
-    const MODE_HTML     = 1;
-    const MODE_MARKDOWN = 2;
+    const MODE_TEXT     = 1;
+    const MODE_HTML     = 2;
+    const MODE_MARKDOWN = 3;
 
     private static $instance = null;
     // 总目录
     private $directory = null;
     // 头信息（标题）
     private $header = null;
-    // 日志模式
-    private $mode = 0;
+    // 日志模式，默认为text
+    private $mode = 1;
 
     /**
      * 功能：实例化函数
@@ -43,21 +45,26 @@ class Log
      * @param string $suffix
      * @return Log|null
      */
-    public static function dir($dirName, $prefix = '', $suffix = '')
+    public static function dir($dirName)
     {
         if (self::$instance === null) {
             self::$instance = new self();
         }
 
-        self::$instance->setDir($dirName);
+        // 读取配置文件
+//        if (!self::$config) {
+        // thinkphp5、laravel4、laravel5
+        if (function_exists('config') === true) {
+            self::$config = config('log');
+        }
+//        }
 
-        // 设置自定义的前、后缀
-        if ($prefix) {
-            self::$prefix = $prefix;
-        }
-        if ($suffix) {
-            self::$suffix = $suffix;
-        }
+        // 设置前、后缀的最终量
+        self::$prefix = (isset(self::$config['log_path']) && self::$config['log_path']) ? self::$config['log_path'] : __DIR__ . '/../../../../runtime/tc_log';
+        self::$suffix = (isset(self::$config['suffix']) && self::$config['suffix']) ? self::$config['suffix'] : '.log';
+
+        // 设置日志写入目录
+        self::$instance->setDir($dirName);
 
         // 清空头信息
         self::$instance->header = null;
@@ -180,7 +187,7 @@ class Log
     private function toString($content)
     {
         // 异常类自动转换文本
-        if ($content instanceof \Exception) {
+        if (($content instanceof \Exception) === true) {
             $content = date('Y-m-d H:i:s') . ' - line ' . $content->getLine() . ' in ' . $content->getFile() . ':<span style="' . $this->getStyle(self::LEVEL_ERROR) . '">' . $content->getMessage() . "</span><br>\n" . $content->getTraceAsString();
         }
 

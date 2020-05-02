@@ -12,7 +12,7 @@ namespace tc_lib;
 class Curl
 {
     // 默认的User-Agent
-    const USER_AGENT = 'tc_lib-Curl/2.x';
+    const USER_AGENT = 'tc_lib-Curl/3.x';
 
     const METHOD_GET    = 'GET';
     const METHOD_POST   = 'POST';
@@ -52,15 +52,15 @@ class Curl
     private function exec($url, $method)
     {
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_HEADER, 0);// 头部不输出
+        curl_setopt($ch, CURLOPT_HEADER, 0); // 头部不输出
 
-        if ($method === self::METHOD_GET) {// GET方式提交，拼接URL字符串
+        if ($method === self::METHOD_GET) { // GET方式提交，拼接URL字符串
             $url .= '?' . http_build_query($this->body);
             curl_setopt($ch, CURLOPT_URL, $url);
-        } else {
-            $this->header[] = 'X-HTTP-Method-Override:' . $method;
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->body);// 设置提交的数据
+        } else { // 非GET方式提交
+            $this->header[] = 'X-HTTP-Method-Override:' . $method; // 设置提交方式
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); // 设置提交方式
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->body); // 设置提交的数据
         }
 
         // 装配header
@@ -95,9 +95,10 @@ class Curl
      */
     public function headers($headers)
     {
-        foreach ($headers as $Key => $value) {
-            $this->header($Key, $value);
+        foreach ($headers as $key => $value) {
+            $this->header($key, $value);
         }
+
         return $this;
     }
 
@@ -114,11 +115,12 @@ class Curl
         // TODO: Implement __call() method.
         if (in_array(strtoupper($name), [self::METHOD_GET, self::METHOD_POST, self::METHOD_PUT, self::METHOD_DELETE])) {
             $url    = $arguments[0];
-            $method = strtoupper($name);// 这里是大写
+            $method = strtoupper($name); // 这里是大写
             $data   = isset($arguments[1]) ? $arguments[1] : [];
-            foreach ($data as $key => $value) {// 填充请求数据
+            foreach ($data as $key => $value) { // 填充请求数据
                 $this->body[$key] = $value;
             }
+
             return $this->exec($url, $method);
         }
     }

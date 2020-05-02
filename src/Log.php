@@ -35,7 +35,7 @@ class Log
     // 头信息（标题）
     private $header = null;
     // 日志模式，默认为text
-    private $mode = 1;
+    private $mode = self::MODE_TEXT;
 
     /**
      * 功能：实例化函数
@@ -52,16 +52,18 @@ class Log
         }
 
         // 读取配置文件
-//        if (!self::$config) {
-        // thinkphp5、laravel4、laravel5
+        // thinkphp5、thinkphp6、laravel4、laravel5
         if (function_exists('config') === true) {
             self::$config = config('log');
         }
-//        }
 
         // 设置前、后缀的最终量
-        self::$prefix = (isset(self::$config['log_path']) && self::$config['log_path']) ? self::$config['log_path'] : __DIR__ . '/../../../../runtime/tc_log';
-        self::$suffix = (isset(self::$config['suffix']) && self::$config['suffix']) ? self::$config['suffix'] : '.log';
+        if (isset(self::$config['log_path']) === true && self::$config['log_path']) {
+            self::$prefix = self::$config['log_path'];
+        }
+        if (isset(self::$config['suffix']) === true && self::$config['suffix']) {
+            self::$suffix = self::$config['suffix'];
+        }
 
         // 设置日志写入目录
         self::$instance->setDir($dirName);
@@ -99,10 +101,10 @@ class Log
     }
 
     /**
-     * 功能：
-     * Created By mq at 11:11 2019-07-10
-     * @param $name
-     * @param $args
+     * 功能：设置日志模式
+     * Created at 2020/2/1 14:22 by mq
+     * @param $mode
+     * @return $this
      */
     public function mode($mode)
     {
@@ -114,9 +116,10 @@ class Log
 
     /**
      * 功能：__call函数反射
-     * Created By mq at 15:00 2019-03-08
+     * Created at 2020/2/1 14:22 by mq
      * @param $name
      * @param $args
+     * @throws \Exception
      */
     public function __call($name, $args)
     {
@@ -131,14 +134,15 @@ class Log
      * Created By mq at 下午2:34 2019/1/5
      * @param $content
      * @param $level
+     * @throws \Exception
      */
     private function write($content, $level)
     {
         if (in_array($level, [self::LEVEL_DEBUG, self::LEVEL_INFO, self::LEVEL_NOTICE, self::LEVEL_WARNING, self::LEVEL_ERROR]) === false) {
-            die('级别错误');
+            throw new \Exception('级别错误');
         }
         if ($this->header === null) {
-            die('没有头信息');
+            throw new \Exception('没有头信息');
         }
         $ip      = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
         $content = $this->toString($content);
@@ -200,8 +204,12 @@ class Log
 
     /**
      * 功能：构建写入字符串
-     * Created By mq at 11:15 2019-07-10
-     * @param $string
+     * Created at 2020/2/1 14:23 by mq
+     * @param $rawStr
+     * @param $level
+     * @param $ip
+     * @return string
+     * @throws \Exception
      */
     private function mkContent($rawStr, $level, $ip)
     {

@@ -52,17 +52,18 @@ class Log
         }
 
         // 读取配置文件
-        // thinkphp5、thinkphp6、laravel4、laravel5
-        if (function_exists('config') === true) {
+        if (function_exists('config') === true) { // thinkPHP5.x、thinkPHP6.0、laravel4.x、laravel5.x、laravel6.0
             self::$config = config('log');
+        } else if (function_exists('C') === true) { // thinkPHP 3.x
+            self::$config = C('log');
         }
 
         // 设置前、后缀的最终量
-        if (isset(self::$config['log_path']) === true && self::$config['log_path']) {
-            self::$prefix = self::$config['log_path'];
+        if (isset(self::$config['tc_log_path']) === true && self::$config['tc_log_path']) {
+            self::$prefix = self::$config['tc_log_path'];
         }
-        if (isset(self::$config['suffix']) === true && self::$config['suffix']) {
-            self::$suffix = self::$config['suffix'];
+        if (isset(self::$config['tc_log_suffix']) === true && self::$config['tc_log_suffix']) {
+            self::$suffix = self::$config['tc_log_suffix'];
         }
 
         // 设置日志写入目录
@@ -153,7 +154,7 @@ class Log
         }
 
         // 寻找写入文件
-        $fileName = date('d') . '-' . $level . self::$suffix;
+        $fileName = date('d') . '-' . $level . self::$suffix; // 文件名：<日>-<级别>.<后缀>
 
         // 构建写入字符串
         $str = $this->mkContent($content, $level, $ip);
@@ -195,6 +196,7 @@ class Log
             $content = date('Y-m-d H:i:s') . ' - line ' . $content->getLine() . ' in ' . $content->getFile() . ':<span style="' . $this->getStyle(self::LEVEL_ERROR) . '">' . $content->getMessage() . "</span><br>\n" . $content->getTraceAsString();
         }
 
+        // 不是字符串的直接JSON序列化
         if (is_string($content) === false) {
             $content = json_encode($content, JSON_UNESCAPED_UNICODE);
         }

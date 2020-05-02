@@ -12,10 +12,6 @@ class Timer
     const LEVEL_MILLISECOND = 1000;    // 单位：毫秒
     const LEVEL_MICROSECOND = 1000000; // 单位：微秒
 
-    const UNIT_SECOND      = 's';
-    const UNIT_MILLISECOND = 'ms';
-    const UNIT_MICROSECOND = 'μs';
-
     private $start_at = null;
     private $end_at = null;
 
@@ -44,9 +40,11 @@ class Timer
 
     /**
      * 功能：计算时间
-     * Created at 2018/12/19 22:26 by 陈庙琴
+     * Created at 2020/2/1 14:26 by mq
      * @param int $level
-     * @return float|int
+     * @param bool $withUnit
+     * @return float|int|string
+     * @throws \Exception
      */
     public function count($level = self::LEVEL_SECOND, $withUnit = false)
     {
@@ -56,19 +54,8 @@ class Timer
             return $val0 + $val1;
         }
 
-        switch ($level) {
-            case self::LEVEL_SECOND:
-                $unit = self::UNIT_SECOND;
-                break;
-            case self::LEVEL_MILLISECOND:
-                $unit = self::UNIT_MILLISECOND;
-                break;
-            case self::LEVEL_MICROSECOND:
-                $unit = self::UNIT_MICROSECOND;
-                break;
-            default:
-                throw new \Exception('未知的时间等级');
-        }
+        $unit = $this->getUnit($level);
+
         return ($val0 + $val1) . $unit;
     }
 
@@ -90,5 +77,22 @@ class Timer
     public function getEndAt()
     {
         return $this->end_at[1] . ltrim($this->end_at[0], '0');
+    }
+
+    /**
+     * 功能：获取时间单位
+     * Created at 2020/2/1 14:43 by mq
+     * @param $level
+     * @return mixed|string
+     */
+    private function getUnit($level)
+    {
+        $result = [
+            self::LEVEL_SECOND      => 's',
+            self::LEVEL_MILLISECOND => 'ms',
+            self::LEVEL_MICROSECOND => 'μs',
+        ];
+
+        return isset($result[$level]) ? $result[$level] : '未知的时间单位';
     }
 }

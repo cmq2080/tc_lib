@@ -48,15 +48,15 @@ class Timer
      */
     public function count($level = self::LEVEL_SECOND, $withUnit = false)
     {
-        $val0 = $this->end_at[0] * $level - $this->start_at[0] * $level;// 毫秒部分计算
-        $val1 = ($this->end_at[1] - $this->start_at[1]) * $level;// 秒部分计算
-        if ($withUnit === false) {
-            return $val0 + $val1;
+        $val0 = $this->end_at[0] * $level - $this->start_at[0] * $level; // 毫秒部分计算（先乘后减，以防小数省略）
+        $val1 = ($this->end_at[1] - $this->start_at[1]) * $level; // 秒部分计算（先减后乘，以防整数溢出）
+
+        $result = $val0 + $val1;
+        if ($withUnit !== false) { // 如果要带单位，还得把单位续上
+            $result .= $this->getUnit($level);
         }
 
-        $unit = $this->getUnit($level);
-
-        return ($val0 + $val1) . $unit;
+        return $result;
     }
 
     /**
